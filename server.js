@@ -5,28 +5,34 @@ import connectDB from './config/mongodb.js';
 import userRouter from './routes/userRoutes.js';
 import imageRouter from './routes/imageRoutes.js';
 
-const app = express()
+const app = express();
 
-app.use(express.json());
+// CORS configuration for your frontend
 app.use(cors({
   origin: [
     'https://genpix-frontend.vercel.app',
     'http://localhost:3000',
     'http://localhost:5173'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.use(express.json());
+
+// Connect to MongoDB
 await connectDB();
 
+// Routes
 app.use('/api/user', userRouter);
 app.use('/api/user', imageRouter);
 app.get('/', (req, res) => res.send("API Working fine"));
 
-// For Vercel serverless deployment
+// Export for Vercel serverless
 export default app;
 
-// For local development
+// Only listen when running locally
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
